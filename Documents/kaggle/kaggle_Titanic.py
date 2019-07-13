@@ -13,10 +13,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+import xgboost as xgb
 
 
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
 
 # Load Data
@@ -116,9 +117,38 @@ X_train, X_test, y_train, y_test = train_test_split(origin_data, origin_label,
                                                     test_size=0.3, random_state=7777)
 
 
+
+"""
+knn_model
+"""
 knn_model = KNeighborsClassifier(n_neighbors=3)
 knn_model.fit(X_train, y_train) 
 knn_model.score(X_test, y_test)
+
+
+
+"""
+xgboost_model
+"""
+xgb_model = xgb.XGBClassifier()
+
+clf = GridSearchCV(xgb_model,
+                   {'max_depth': [2,4,6],
+                    'n_estimators': [50,100,200]}, verbose=1)
+clf.fit(X_train, y_train)
+print(clf.best_score_)
+print(clf.best_params_)
+#clf = GridSearchCV(xgb_model,
+#                   {'max_depth': [2,4,6],
+#                    'n_estimators': [50,100,200]}, verbose=1)
+clf.fit(X_train, y_train, early_stopping_rounds=10, 
+        eval_metric="auc", eval_set=[(X_test, y_test)])
+
+
+
+
+
+
 
 
 
